@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="slot">
+
+
+
+    <select id="getSlot" parameterType="int" resultType="com.kaybo.slot.model.Slot">
+        SELECT  *
+        FROM 	slots
+        WHERE 	id = #{id};
+    </select>
+
+    <select id="getPaytables"  resultType="com.kaybo.slot.model.Paytable">
+        SELECT  *
+        FROM 	paytables;
+    </select>
+
+    <select id="getPaytable"  parameterType="int" resultType="com.kaybo.slot.model.Paytable">
+        SELECT  *
+        FROM 	paytables
+        where id = #{paytableId};
+    </select>
+
+    <insert id="insertPool" parameterType="com.kaybo.slot.model.Pool">
+        INSERT INTO pools
+        (id, symbols, pay_id)
+        VALUES
+        (#{id}, #{symbols}, #{payId});
+    </insert>
+
+    <insert id="deletePool">
+        TRUNCATE pools CASCADE;
+    </insert>
+
+    <insert id="deleteShuffle">
+        TRUNCATE shuffles CASCADE;
+    </insert>
+
+    <insert id="insertShuffle">
+        INSERT INTO shuffles (id, symbols, pay_id)
+            SELECT nextval('spin_count_seq'), a.symbols, a.pay_id
+            FROM ( SELECT symbols, pay_id FROM pools ORDER BY random())  a
+
+    </insert>
+
+    <select id="getSpinCount" resultType="int">
+        select nextval('spin_count_seq') ;
+    </select>
+
+    <select id="getShuffle" parameterType="int" resultType="com.kaybo.slot.model.Pool">
+        SELECT  *
+        FROM 	shuffles
+        where id = #{id};
+    </select>
+
+    <select id="selectReward" parameterType="int" resultType="com.kaybo.slot.model.Reward">
+        SELECT  *
+        FROM 	rewards
+        WHERE count = #{count};
+    </select>
+
+    <insert id="insertHistory" parameterType="com.kaybo.slot.model.History">
+        INSERT INTO history
+        (user_no, reward_id)
+        VALUES
+        (#{userNo}, #{rewardId});
+    </insert>
+
+    <select id="listHistory" parameterType="String" resultType="com.kaybo.slot.model.History">
+        SELECT  a.reward_id, a.reg_date, b.type, b.value
+        FROM 	history a, rewards b
+        WHERE   a.user_no = #{userNO}
+        AND     a.reward_id = b.id
+        ORDER BY a.reg_date;
+    </select>
+</mapper>
