@@ -3,8 +3,10 @@ package com.kaybo.slot.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Pool {
+    @JsonIgnore
     private int id;
     private String symbols;
+    @JsonIgnore
     private int paytableId;
     private int multiplier;
     private Reward reward;

@@ -2,19 +2,71 @@ package com.kaybo.slot.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Date;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class History {
 
+    private int id;
     private String userNo;
-    private int rewardId;
-    private long timestamp;
+    private long achievedAt = -1;
+    private long paidAt = -1;
+
     @JsonIgnore
-    private Date regDate;
+    private Date achievedDate;
+    @JsonIgnore
+    private Date paidDate;
+
+    @JsonIgnore
+    private int condition;
+    @JsonIgnore
     private int type;
-    private String value;
+    @JsonIgnore
+    private int count;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public long getAchievedAt() {
+        return achievedAt;
+    }
+
+    public void setAchievedAt(long achievedAt) {
+        this.achievedAt = achievedAt;
+    }
+
+    public long getPaidAt() {
+        return paidAt;
+    }
+
+    public void setPaidAt(long paidAt) {
+        this.paidAt = paidAt;
+    }
+
+    public Date getAchievedDate() {
+        return achievedDate;
+    }
+
+    public void setAchievedDate(Date achievedDate) {
+        this.achievedDate = achievedDate;
+        this.achievedAt = achievedDate.getTime();
+    }
+
+    public Date getPaidDate() {
+        return paidDate;
+    }
+
+    public void setPaidDate(Date paidDate) {
+        this.paidDate = paidDate;
+        this.paidAt = paidDate.getTime();
+    }
 
     public String getUserNo() {
         return userNo;
@@ -24,20 +76,12 @@ public class History {
         this.userNo = userNo;
     }
 
-    public int getRewardId() {
-        return rewardId;
+    public int getCondition() {
+        return condition;
     }
 
-    public void setRewardId(int rewardId) {
-        this.rewardId = rewardId;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
+    public void setCondition(int condition) {
+        this.condition = condition;
     }
 
     public int getType() {
@@ -48,20 +92,11 @@ public class History {
         this.type = type;
     }
 
-    public String getValue() {
-        return value;
+    public int getCount() {
+        return count;
     }
 
-    public void setValue(String value) {
-        this.value = value;
-    }
-
-    public Date getRegDate() {
-        return regDate;
-    }
-
-    public void setRegDate(Date regDate) {
-        this.regDate = regDate;
-        this.timestamp = regDate.getTime();
+    public void setCount(int count) {
+        this.count = count;
     }
 }

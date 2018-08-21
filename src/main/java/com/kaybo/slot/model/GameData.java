@@ -9,7 +9,7 @@ import java.util.List;
 public class GameData {
 
     private int spinCount;
-    private List<History> items;
+    private List<History> rewards;
 
     public int getSpinCount() {
         return spinCount;
@@ -19,11 +19,11 @@ public class GameData {
         this.spinCount = spinCount;
     }
 
-    public List<History> getItems() {
-        return items;
+    public List<History> getRewards() {
+        return rewards;
     }
 
-    public void setItems(List<History> items) {
-        this.items = items;
+    public void setRewards(List<History> rewards) {
+        this.rewards = rewards;
     }
 }

@@ -1,14 +1,18 @@
 package com.kaybo.slot.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Reward {
 
     private int id;
-    private int count;
+    @JsonIgnore
+    private int condition;
+    @JsonIgnore
     private int type;
-    private String value;
+    @JsonIgnore
+    private int count;
 
     public int getId() {
         return id;
@@ -18,12 +22,12 @@ public class Reward {
         this.id = id;
     }
 
-    public int getCount() {
-        return count;
+    public int getCondition() {
+        return condition;
     }
 
-    public void setCount(int count) {
-        this.count = count;
+    public void setCondition(int condition) {
+        this.condition = condition;
     }
 
     public int getType() {
@@ -34,11 +38,11 @@ public class Reward {
         this.type = type;
     }
 
-    public String getValue() {
-        return value;
+    public int getCount() {
+        return count;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setCount(int count) {
+        this.count = count;
     }
 }
