@@ -254,6 +254,7 @@ public class SlotController {
             response = restTemplate.exchange(platformUrl + "/game/" + gameNo + "/getCash", HttpMethod.POST, httpEntity, String.class);
 
         }catch (Exception ex){
+            ex.printStackTrace();
             throw new AppException(-9977, "Bad Request");
         }
 
