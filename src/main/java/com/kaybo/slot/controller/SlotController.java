@@ -50,7 +50,7 @@ public class SlotController {
 
         GameItem gameItem = new GameItem();
         gameItem.setCash(100);
-        gameItem.setItemId("1");
+        gameItem.setItemId("10010001");
         gameItem.setItemName("spin100");
         gameItem.setIpAddr(httpServletRequest.getRemoteAddr());
 
@@ -78,8 +78,8 @@ public class SlotController {
 
         Pool pool = sqlSessionTemplate.selectOne("slot.getShuffle", count);
 
-        if(pool.getPaytableId() > 0){
-            Paytable paytable = sqlSessionTemplate.selectOne("slot.getPaytable", pool.getPaytableId());
+        if(pool.getPayId() > 0){
+            Paytable paytable = sqlSessionTemplate.selectOne("slot.getPaytable", pool.getPayId());
             pool.setMultiplier(paytable.getMultiplier());
             //todo 캐쉬지급 해야함
             //100 * multiplier
@@ -137,7 +137,7 @@ public class SlotController {
                 count++;
                 if(history.getType() == 1){
                     getCash(userNo, userKey, gameNo, history.getCount(), httpServletRequest.getRemoteAddr());
-
+                    //sqlSessionTemplate.update("slot.updateHistory", history);
                 }else{
 
                     RestTemplate restTemplate = new RestTemplate();
@@ -172,8 +172,9 @@ public class SlotController {
                         throw new AppException(response.getStatusCode().value(), "Bad Request");
                     }*/
 
-                    sqlSessionTemplate.update("slot.updateHistory", history);
+                    //sqlSessionTemplate.update("slot.updateHistory", history);
                 }
+                sqlSessionTemplate.update("slot.updateHistory", history);
             }
 
         }

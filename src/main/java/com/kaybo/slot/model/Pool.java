@@ -7,7 +7,7 @@ public class Pool {
     private int id;
     private String symbols;
     @JsonIgnore
-    private int paytableId;
+    private int payId;
     private int multiplier;
     private Reward reward;
 
@@ -27,12 +27,12 @@ public class Pool {
         this.symbols = symbols;
     }
 
-    public int getPaytableId() {
-        return paytableId;
+    public int getPayId() {
+        return payId;
     }
 
-    public void setPaytableId(int paytableId) {
-        this.paytableId = paytableId;
+    public void setPayId(int payId) {
+        this.payId = payId;
     }
 
     public int getMultiplier() {

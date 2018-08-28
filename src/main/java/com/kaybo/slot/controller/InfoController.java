@@ -38,7 +38,7 @@ public class InfoController {
                 Pool pool = new Pool();
                 pool.setId(count);
                 pool.setSymbols(paytable.getSymbolId() + "," + paytable.getSymbolId() + "," + paytable.getSymbolId());
-                pool.setPaytableId(paytable.getId());
+                pool.setPayId(paytable.getId());
 
                 sqlSessionTemplate.insert("slot.insertPool", pool);
                 count++;
@@ -58,7 +58,7 @@ public class InfoController {
                 Pool pool = new Pool();
                 pool.setId(count);
                 pool.setSymbols(s1 + "," + s2 + "," + s3);
-                pool.setPaytableId(-1);
+                pool.setPayId(-1);
                 sqlSessionTemplate.insert("slot.insertPool", pool);
                 count++;
             }
