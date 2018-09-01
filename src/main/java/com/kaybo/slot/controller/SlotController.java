@@ -70,7 +70,13 @@ public class SlotController {
         ResponseEntity<String> response = restTemplate.exchange(platformUrl + "/game/" + gameNo + "/useCash", HttpMethod.POST, httpEntity, String.class);
 
         if(response.getStatusCode() != HttpStatus.OK){
-            throw new AppException(-9988, "Bad Request");
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode actualObj = objectMapper.readTree(response.getBody());
+            int errCode = Integer.parseInt(actualObj.get("errCode").toString());
+            String errMsg = actualObj.get("errMsg").toString();
+
+            throw new AppException(errCode, errMsg);
         }
         // spin 결과값 보여주기
 
@@ -83,7 +89,7 @@ public class SlotController {
             pool.setMultiplier(paytable.getMultiplier());
             //todo 캐쉬지급 해야함
             //100 * multiplier
-            getCash(userNo, userKey, gameNo, 100 * paytable.getMultiplier(), httpServletRequest.getRemoteAddr());
+            getCash(userNo, userKey, gameNo, 100 * paytable.getMultiplier(), httpServletRequest.getRemoteAddr(), "kp_10010001_win");
 
         }
 
@@ -112,7 +118,7 @@ public class SlotController {
 
         GameData gameData = new GameData();
 
-        int spinCount = getUserSpinCount(userNo,userKey,gameNo) + 1;
+        int spinCount = getUserSpinCount(userNo,userKey,gameNo);
         gameData.setSpinCount(spinCount);
 
         List<History> rewards = sqlSessionTemplate.selectList("slot.listHistory", userNo);
@@ -136,37 +142,40 @@ public class SlotController {
             if(history.getAchievedAt() != -1 && history.getPaidAt() == -1){
                 count++;
                 if(history.getType() == 1){
-                    getCash(userNo, userKey, gameNo, history.getCount(), httpServletRequest.getRemoteAddr());
+                    getCash(userNo, userKey, gameNo, history.getCount(), httpServletRequest.getRemoteAddr(), "kp_10010001_reward");
                     //sqlSessionTemplate.update("slot.updateHistory", history);
                 }else{
 
-                    RestTemplate restTemplate = new RestTemplate();
-                    HttpHeaders headers = new HttpHeaders();
-                    headers.add("userNo", userNo);
-                    headers.add("userKey", userKey);
-                    headers.setContentType(MediaType.APPLICATION_JSON);
+                    for(int i=0; i<history.getCount(); i++){
+                        RestTemplate restTemplate = new RestTemplate();
+                        HttpHeaders headers = new HttpHeaders();
+                        headers.add("userNo", userNo);
+                        headers.add("userKey", userKey);
+                        headers.setContentType(MediaType.APPLICATION_JSON);
 
-                    ItemRequest itemRequest  = new ItemRequest();
-                    itemRequest.setCpCode("SLOT");
-                    itemRequest.setGameCode("SF");
-                    itemRequest.setUserUid(Integer.parseInt(userNo));
-                    itemRequest.setItemId(history.getType());
+                        ItemRequest itemRequest  = new ItemRequest();
+                        itemRequest.setCpCode("SLOT");
+                        itemRequest.setGameCode("SF");
+                        itemRequest.setUserUid(Integer.parseInt(userNo));
+                        itemRequest.setItemId(history.getType());
 
-                    HttpEntity<?> httpEntity = new HttpEntity<Object>(itemRequest, headers);
-                    ResponseEntity<String> response = restTemplate.exchange(platformUrl + "/game/" + gameNo + "/getItem", HttpMethod.POST, httpEntity, String.class);
+                        HttpEntity<?> httpEntity = new HttpEntity<Object>(itemRequest, headers);
+                        ResponseEntity<String> response = restTemplate.exchange(platformUrl + "/game/" + gameNo + "/getItem", HttpMethod.POST, httpEntity, String.class);
 
 
-                    ObjectMapper mapper = new ObjectMapper();
-                    JsonNode actualObj = mapper.readTree(response.getBody());
+                        ObjectMapper mapper = new ObjectMapper();
+                        JsonNode actualObj = mapper.readTree(response.getBody());
 
-                    JsonNode message = actualObj.get("message");
+                        JsonNode message = actualObj.get("message");
 
-                    String result = message.get("result").toString();
-                    String result_message = message.get("result_msg").toString();
+                        String result = message.get("result").toString();
+                        String result_message = message.get("result_msg").toString();
 
-                    if(!result.equals("200")){
-                        throw new AppException(Integer.parseInt(result), result_message);
+                        if(!result.equals("200")){
+                            throw new AppException(Integer.parseInt(result), result_message);
+                        }
                     }
+
 
 /*                    if(response.getStatusCode() != HttpStatus.OK){
                         throw new AppException(response.getStatusCode().value(), "Bad Request");
@@ -174,6 +183,8 @@ public class SlotController {
 
                     //sqlSessionTemplate.update("slot.updateHistory", history);
                 }
+
+                logger.info(history.toString());
                 sqlSessionTemplate.update("slot.updateHistory", history);
             }
 
@@ -222,25 +233,27 @@ public class SlotController {
                            @RequestHeader(value="userKey") String userKey,
                            @PathVariable String gameNo) throws IOException {
 
-        String xxx = "{\"message\":{\"result\":404,\"result_msg\":\"user not found\"},\"status\":200}";
+        //String xxx = "{\"message\":{\"result\":404,\"result_msg\":\"user not found\"},\"status\":200}";
+        String xxx = "{\"errCode\":\"sfs\",\"errMsg\":\"sfsf\"}";
 
         ObjectMapper mapper = new ObjectMapper();
         JsonNode actualObj = mapper.readTree(xxx);
 
-        JsonNode message = actualObj.get("message");
+        String errCode = actualObj.get("errCode").toString();
+        String errMsg = actualObj.get("errMsg").toString();
 
-        String result = message.get("result").toString();
-        String result_message = message.get("result_msg").toString();
 
-        logger.info(result);
-        logger.info(result_message);
+        logger.info(errCode);
+        logger.info(errMsg);
 
     }
 
-    private void getCash(String userNo, String userKey, String gameNo, int cash, String ipAddr){
+    private void getCash(String userNo, String userKey, String gameNo, int cash, String ipAddr,
+                         String playtoolName) throws IOException{
         GameItem gameItem = new GameItem();
         gameItem.setCash(cash);
         gameItem.setIpAddr(ipAddr);
+        gameItem.setPaytoolName(playtoolName);
 
         HttpHeaders headers = new HttpHeaders();
         headers.add("userNo", userNo);
@@ -250,7 +263,7 @@ public class SlotController {
         RestTemplate restTemplate = new RestTemplate();
         HttpEntity<?> httpEntity = new HttpEntity<Object>(gameItem, headers);
 
-        ResponseEntity<String> response = null;
+/*        ResponseEntity<String> response = null;
         try{
             response = restTemplate.exchange(platformUrl + "/game/" + gameNo + "/getCash", HttpMethod.POST, httpEntity, String.class);
 
@@ -261,6 +274,21 @@ public class SlotController {
 
         if(response.getStatusCode() != HttpStatus.OK){
             throw new AppException(-9976, "Bad Request");
+        }*/
+
+
+
+
+        ResponseEntity<String> response = restTemplate.exchange(platformUrl + "/game/" + gameNo + "/getCash", HttpMethod.POST, httpEntity, String.class);
+
+        if(response.getStatusCode() != HttpStatus.OK){
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode actualObj = objectMapper.readTree(response.getBody());
+            int errCode = Integer.parseInt(actualObj.get("errCode").toString());
+            String errMsg = actualObj.get("errMsg").toString();
+
+            throw new AppException(errCode, errMsg);
         }
     }
 

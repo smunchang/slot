@@ -76,7 +76,7 @@
     </insert>
 
     <select id="listHistory" parameterType="String" resultType="com.kaybo.slot.model.History">
-        SELECT a.id, a.condition, a.type, a.count, b.achieved_date, b.paid_date
+        SELECT a.id, a.condition, a.type, a.count, b.achieved_date, b.paid_date, b.user_no
         FROM rewards a LEFT OUTER JOIN history b ON a.id = b.id
         AND b.user_no = #{userNo}
         ORDER BY a.id

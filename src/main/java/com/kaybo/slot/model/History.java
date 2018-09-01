@@ -10,6 +10,7 @@ import java.util.Date;
 public class History {
 
     private int id;
+    @JsonIgnore
     private String userNo;
     private long achievedAt = -1;
     private long paidAt = -1;
@@ -98,5 +99,21 @@ public class History {
 
     public void setCount(int count) {
         this.count = count;
+    }
+
+
+    @Override
+    public String toString() {
+        return "History{" +
+                "id=" + id +
+                ", userNo='" + userNo + '\'' +
+                ", achievedAt=" + achievedAt +
+                ", paidAt=" + paidAt +
+                ", achievedDate=" + achievedDate +
+                ", paidDate=" + paidDate +
+                ", condition=" + condition +
+                ", type=" + type +
+                ", count=" + count +
+                '}';
     }
 }
